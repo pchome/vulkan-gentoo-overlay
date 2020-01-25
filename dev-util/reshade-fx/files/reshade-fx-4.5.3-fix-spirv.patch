@@ -1,0 +1,81 @@
+From 21b798d0bd6fb400fc9aab8e8b8b11c442d9c2dd Mon Sep 17 00:00:00 2001
+From: crosire <crosiredev@gmail.com>
+Date: Mon, 20 Jan 2020 23:31:55 +0100
+Subject: [PATCH] Fix SPIR-V code generation for function calls with sampler
+ arguments
+
+---
+ source/effect_codegen_spirv.cpp |  7 +++++--
+ source/effect_parser.cpp        | 20 +++++++++++++++-----
+ 2 files changed, 20 insertions(+), 7 deletions(-)
+
+diff --git a/source/effect_codegen_spirv.cpp b/source/effect_codegen_spirv.cpp
+index 651a8df7..54bd3abe 100644
+--- a/source/effect_codegen_spirv.cpp
++++ b/source/effect_codegen_spirv.cpp
+@@ -317,6 +317,10 @@ class codegen_spirv final : public codegen
+ 
+ 	spv::Id convert_type(const type &info, bool is_ptr = false, spv::StorageClass storage = spv::StorageClassFunction)
+ 	{
++		// There cannot be function local sampler variables, so always assume uniform storage for them
++		if (info.is_sampler())
++			storage = spv::StorageClassUniformConstant;
++
+ 		if (auto it = std::find_if(_type_lookup.begin(), _type_lookup.end(),
+ 			[&](const auto &lookup) { return lookup.type == info && lookup.is_ptr == is_ptr && lookup.storage == storage; }); it != _type_lookup.end())
+ 			return it->id;
+@@ -1333,8 +1337,7 @@ class codegen_spirv final : public codegen
+ 	}
+ 	void emit_store(const expression &exp, id value) override
+ 	{
+-		assert(value != 0);
+-		assert(exp.is_lvalue && !exp.is_constant);
++		assert(value != 0 && exp.is_lvalue && !exp.is_constant && !exp.type.is_sampler());
+ 
+ 		add_location(exp.location, *_current_block_data);
+ 
+diff --git a/source/effect_parser.cpp b/source/effect_parser.cpp
+index 4042877e..6e520bbb 100644
+--- a/source/effect_parser.cpp
++++ b/source/effect_parser.cpp
+@@ -880,9 +880,17 @@ bool reshadefx::parser::parse_expression_unary(expression &exp)
+ 
+ 				if (symbol.op == symbol_type::function || param_type.has(type::q_out))
+ 				{
+-					// All user-defined functions actually accept pointers as arguments, same applies to intrinsics with 'out' parameters
+-					const auto temp_variable = _codegen->define_variable(arguments[i].location, param_type);
+-					parameters[i].reset_to_lvalue(arguments[i].location, temp_variable, param_type);
++					if (param_type.is_sampler())
++					{
++						// Do not shadow sampler parameters to function calls (but do load them for intrinsics)
++						parameters[i] = arguments[i];
++					}
++					else
++					{
++						// All user-defined functions actually accept pointers as arguments, same applies to intrinsics with 'out' parameters
++						const auto temp_variable = _codegen->define_variable(arguments[i].location, param_type);
++						parameters[i].reset_to_lvalue(arguments[i].location, temp_variable, param_type);
++					}
+ 				}
+ 				else
+ 				{
+@@ -892,7 +900,8 @@ bool reshadefx::parser::parse_expression_unary(expression &exp)
+ 
+ 			// Copy in parameters from the argument access chains to parameter variables
+ 			for (size_t i = 0; i < arguments.size(); ++i)
+-				if (parameters[i].is_lvalue && parameters[i].type.has(type::q_in)) // Only do this for pointer parameters as discovered above
++				// Only do this for pointer parameters as discovered above
++				if (parameters[i].is_lvalue && parameters[i].type.has(type::q_in) && !parameters[i].type.is_sampler())
+ 					_codegen->emit_store(parameters[i], _codegen->emit_load(arguments[i]));
+ 
+ 			// Check if the call resolving found an intrinsic or function and invoke the corresponding code
+@@ -904,7 +913,8 @@ bool reshadefx::parser::parse_expression_unary(expression &exp)
+ 
+ 			// Copy out parameters from parameter variables back to the argument access chains
+ 			for (size_t i = 0; i < arguments.size(); ++i)
+-				if (parameters[i].is_lvalue && parameters[i].type.has(type::q_out)) // Only do this for pointer parameters as discovered above
++				// Only do this for pointer parameters as discovered above
++				if (parameters[i].is_lvalue && parameters[i].type.has(type::q_out) && !parameters[i].type.is_sampler())
+ 					_codegen->emit_store(arguments[i], _codegen->emit_load(parameters[i]));
+ 		}
+ 		else if (symbol.op == symbol_type::invalid)

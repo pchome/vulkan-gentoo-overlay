@@ -1,0 +1,23 @@
+From e8ba138703e7789e100837b94409e7f75988f6dc Mon Sep 17 00:00:00 2001
+From: crosire <crosiredev@gmail.com>
+Date: Thu, 23 Jan 2020 20:38:27 +0100
+Subject: [PATCH] Fix effect parser going into infinite loop when encountering
+ an error inside a namespace
+
+---
+ source/effect_parser.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/effect_parser.cpp b/source/effect_parser.cpp
+index 6e520bbb..268fad99 100644
+--- a/source/effect_parser.cpp
++++ b/source/effect_parser.cpp
+@@ -2126,7 +2126,7 @@ bool reshadefx::parser::parse_top()
+ 		bool parse_success = true;
+ 
+ 		// Recursively parse top level statements until the namespace is closed again
+-		while (!peek('}')) // Empty namespaces are valid
++		while (!peek('}') && parse_success) // Empty namespaces are valid
+ 		{
+ 			if (!parse_top())
+ 				parse_success = false; // Continue parsing even after encountering an error
