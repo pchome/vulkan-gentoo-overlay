@@ -1,0 +1,15 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -164,9 +164,9 @@
+ 	if (NOT SPIRV_CROSS_SKIP_INSTALL)
+ 		install(TARGETS ${name}
+ 			EXPORT ${config_name}Config
+-			RUNTIME DESTINATION bin
+-			LIBRARY DESTINATION lib
+-			ARCHIVE DESTINATION lib
++			RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
++			LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++			ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+ 			PUBLIC_HEADER DESTINATION include/spirv_cross)
+ 		install(FILES ${hdrs} DESTINATION include/spirv_cross)
+ 		install(EXPORT ${config_name}Config DESTINATION share/${config_name}/cmake)
