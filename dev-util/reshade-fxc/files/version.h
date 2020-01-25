@@ -1,0 +1,4 @@
+#define VERSION_MAJOR 4
+#define VERSION_MINOR 5
+#define VERSION_REVISION 3
+#define VERSION_STRING_PRODUCT "ReShade FX compiler"
