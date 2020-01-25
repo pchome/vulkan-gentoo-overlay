@@ -1,0 +1,14 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -74,6 +74,11 @@
+     add_definitions(-DENABLE_HLSL)
+ endif(ENABLE_HLSL)
+ 
++if(ENABLE_OPT)
++    find_package(SPIRV-Tools)
++    include(/usr/${CMAKE_INSTALL_LIBDIR}/cmake/SPIRV-Tools-opt/SPIRV-Tools-optConfig.cmake)
++endif(ENABLE_OPT)
++
+ if(ENABLE_GLSLANG_WEB)
+     add_definitions(-DGLSLANG_WEB)
+     if(ENABLE_GLSLANG_WEB_DEVEL)
