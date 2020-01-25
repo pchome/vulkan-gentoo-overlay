@@ -23,7 +23,7 @@ SLOT="0"
 RESTRICT="test"
 
 RDEPEND="media-libs/vulkan-loader[${MULTILIB_USEDEP},layers]
-	dev-util/reshade-fx-shaders"
+	dev-util/reshade-shaders"
 
 BDEPEND="dev-util/vulkan-headers
 	dev-util/glslang
