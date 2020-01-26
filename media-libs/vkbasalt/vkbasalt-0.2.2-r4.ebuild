@@ -54,6 +54,13 @@ src_prepare() {
 			-e 's#../reshade/source/#reshade/#g' \
 			-i "${sfile}"
 	done
+
+	# TMP Hack: support reshadeEffectsPath= option
+	for sfile in ${S}/src/*; do
+		sed -E \
+			-e 's#\(pConfig->getOption\(effectName\)\)#(std::filesystem::path(pConfig->getOption("reshadeEffectsPath", "")) /= pConfig->getOption(effectName))#g' \
+			-i "${sfile}"
+	done
 }
 
 multilib_src_configure() {
