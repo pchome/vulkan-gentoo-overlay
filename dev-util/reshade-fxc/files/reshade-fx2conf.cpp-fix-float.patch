@@ -28,7 +28,7 @@
 +    output << "#" << spc.name << " = " << print_value(spc.type, spc.initializer_value);
 +
 +    // float2/3/4 handle
-+    if (spc.type.is_floating_point() && hold != spc.name) {
++    if (hold != spc.name) {
 +      hold.assign(spc.name);
 +      continue;
 +    }
