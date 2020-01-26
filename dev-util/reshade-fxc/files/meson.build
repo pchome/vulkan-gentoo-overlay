@@ -5,3 +5,9 @@ executable('reshade-fxc', 'tools/fxc.cpp',
   dependencies: [ declare_dependency(link_args: [ '-lreshade-fx' ]) ],
   include_directories: [ '/usr/include/reshade' ],
   install: true)
+
+# https://github.com/DadSchoorse/ReshadeFxCompiler/pull/1
+executable('reshade-fx2conf', 'tools/fx2conf.cpp',
+  dependencies: [ declare_dependency(link_args: [ '-lreshade-fx' ]) ],
+  include_directories: [ '/usr/include/reshade' ],
+  install: true)

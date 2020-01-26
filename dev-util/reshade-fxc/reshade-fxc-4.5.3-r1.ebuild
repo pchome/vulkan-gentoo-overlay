@@ -20,6 +20,13 @@ BDEPEND="${DEPEND}"
 
 S="${WORKDIR}/reshade-${PV}"
 
+# TMP Hack for vkBasalt config helper
+PATCHES=(
+	"${FILESDIR}/reshade-fx2conf.cpp.patch"
+	"${FILESDIR}/reshade-fx2conf.cpp-fix-combo.patch"
+	"${FILESDIR}/reshade-fx2conf.cpp-fix-float.patch"
+)
+
 src_configure() {
 	cp "${FILESDIR}/meson.build" ${S}/
 	cp "${FILESDIR}/version.h" ${S}/tools/
