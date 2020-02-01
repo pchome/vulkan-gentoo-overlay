@@ -20,9 +20,12 @@ BDEPEND="${DEPEND}"
 
 S="${WORKDIR}/reshade-${PV}"
 
+# Backported upstream patches
 PATCHES=(
 	"${FILESDIR}/${P}-fix-spirv.patch"
 	"${FILESDIR}/${P}-fix-parser.patch"
+	"${FILESDIR}/${P}-add-enums.patch"
+	"${FILESDIR}/${P}-avoid-ImageGatherExtended.patch"
 )
 
 multilib_src_configure() {
