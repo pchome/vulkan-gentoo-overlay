@@ -10,24 +10,28 @@ inherit meson multilib-minimal
 DESCRIPTION="A vulkan post processing layer"
 HOMEPAGE="https://github.com/DadSchoorse/vkBasalt"
 
-EGIT_REPO_URI="https://github.com/DadSchoorse/vkBasalt.git"
-EGIT_SUBMODULES=()
-EGIT_BRANCH="wip-reshade-fx"
-inherit git-r3
-SRC_URI=""
-KEYWORDS="-* ~amd64"
+if [[ ${PV} == "9999" ]] ; then
+	EGIT_REPO_URI="https://github.com/DadSchoorse/vkBasalt.git"
+	EGIT_SUBMODULES=()
+	inherit git-r3
+	SRC_URI=""
+else
+	SRC_URI="https://github.com/DadSchoorse/vkBasalt/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+	KEYWORDS="-* ~amd64"
+	S="${WORKDIR}/vkBasalt-${PV}"
+fi
 
 LICENSE="ZLIB"
 SLOT="0"
 
 RESTRICT="test"
 
-RDEPEND="media-libs/vulkan-loader[${MULTILIB_USEDEP},layers]
+RDEPEND="!<media-libs/vulkan-loader-1.1:=[${MULTILIB_USEDEP},layers]
 	dev-util/reshade-shaders"
 
-BDEPEND="dev-util/vulkan-headers
+BDEPEND="!<dev-util/vulkan-headers-1.1
 	dev-util/glslang
-	dev-util/reshade-fx
+	>=dev-util/reshade-fx-4.5.3
 	>=dev-util/meson-0.49"
 
 DEPEND="${RDEPEND}"
