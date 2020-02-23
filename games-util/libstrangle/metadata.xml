@@ -2,7 +2,6 @@
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
 	<upstream>
-		<remote-id type="github">LunarG/VulkanTools</remote-id>
+		<remote-id type="gitlab">torkel104/libstrangle</remote-id>
 	</upstream>
 </pkgmetadata>
-
